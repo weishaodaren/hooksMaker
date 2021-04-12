@@ -1,20 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useLifecycles } from './components';
+import { useEffect, useState, useRef, FC } from 'react';
+// import { useLifecycles } from './components';
 
-const Btn = () => {
-  const [count, setCount] = useState(0);
+interface IProps {
+  fn: () => void;
+}
 
-  useLifecycles(
-    () => console.log(`isMount`),
-    () => console.log(`isUnmount`)
-  );
+const Btn: FC<IProps> = ({ fn }) => {
+  const fnRef = useRef<Function>(fn);
+  const [count, setCount] = useState<number>(0);
 
-  useEffect(() => {
-    console.log('open', count);
-    return () => {
-      console.log(`close`, count);
-    };
-  }, [count]);
+  useEffect(() => () => fnRef.current(), []);
 
   return (
     <button onClick={() => setCount((count) => (count += 1))}>
@@ -24,9 +19,13 @@ const Btn = () => {
 };
 
 const App = () => {
+  const fn = () => {
+    console.log(12);
+  };
+
   return (
     <div>
-      <Btn />
+      <Btn fn={fn} />
     </div>
   );
 };
