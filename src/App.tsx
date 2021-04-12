@@ -1,15 +1,33 @@
-import React, { useEffect } from 'react';
-import { useMount } from './components';
+import { useEffect, useState } from 'react';
+import { useLifecycles } from './components';
 
-const App = () => {
-  useMount(() => {
-    console.log(123321);
-  });
+const Btn = () => {
+  const [count, setCount] = useState(0);
+
+  useLifecycles(
+    () => console.log(`isMount`),
+    () => console.log(`isUnmount`)
+  );
 
   useEffect(() => {
-    console.log(234234);
-  }, []);
+    console.log('open', count);
+    return () => {
+      console.log(`close`, count);
+    };
+  }, [count]);
 
-  return <div>010</div>;
+  return (
+    <button onClick={() => setCount((count) => (count += 1))}>
+      Click me {count}
+    </button>
+  );
+};
+
+const App = () => {
+  return (
+    <div>
+      <Btn />
+    </div>
+  );
 };
 export default App;
