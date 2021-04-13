@@ -1,10 +1,12 @@
-import { useState, useRef, useEffect, useCallback, FC } from 'react';
+// import usePersistFn from '../usePersistFn';
+
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 export enum ReadyState {
-  Connecting,
-  Open,
-  Closing,
-  Closed,
+  Connecting = 0,
+  Open = 1,
+  Closing = 2,
+  Closed = 3,
 }
 
 export interface Options {
@@ -26,11 +28,10 @@ export interface Result {
   webSocketIns?: WebSocket;
 }
 
-export interface IProps {
-  socketUrl: string;
-  options: Options;
-}
-export const useWebSocket: FC<IProps> = (socketUrl, options = {}) => {
+export default function useWebSocket(
+  socketUrl: string,
+  options: Options = {}
+): Result {
   const {
     reconnectLimit = 3,
     reconnectInterval = 3 * 1000,
@@ -75,7 +76,7 @@ export const useWebSocket: FC<IProps> = (socketUrl, options = {}) => {
     }
 
     try {
-      websocketRef.current = new WebSocket(socketUrl as any);
+      websocketRef.current = new WebSocket(socketUrl);
       websocketRef.current.onerror = (event) => {
         reconnect();
         onError && onError(event);
@@ -149,4 +150,4 @@ export const useWebSocket: FC<IProps> = (socketUrl, options = {}) => {
     readyState,
     webSocketIns: websocketRef.current,
   };
-};
+}
