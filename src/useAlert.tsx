@@ -4,57 +4,47 @@ import { Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 
 /**
- * Class
+ * Type
  * @description 提示框状态常量
  */
-class AlertStatus {
-  // 成功
-  static get SUCCESS() {
-    return 'success';
-  }
+type AlertStatus = 'SUCCESS' | 'ERROR' | 'WARNING' | 'INFO';
 
-  // 错误
-  static get ERROR() {
-    return 'error';
-  }
-
-  // 警告
-  static get WARNING() {
-    return 'warning';
-  }
-
-  // 提示
-  static get INFO() {
-    return 'info';
-  }
+/**
+ * Interface
+ * @description 接受参数接口
+ */
+interface AltertParams {
+  icon: AlertStatus;
+  message: string;
 }
 
 /**
+ * Hooks
  * @description Alert组件
  *  状态 'success' 'error' 'info' 'warning'
  */
 const useAlert = () => {
-  const [message, setMessage] = useState(null); // 控制信息展示
-  const [status, setStatus] = useState(null); // 控制展示状态
+  const [message, setMessage] = useState<null | string>(null); // 控制信息展示
+  const [status, setStatus] = useState<null | AlertStatus>(null); // 控制展示状态
   const [visible, setVisible] = useState(false); // 控制显示隐藏
 
   /**
    * Callback
    * @description 显示Alert
    */
-  const onOpen = useCallback((params) => {
+  const onOpen: (T: AltertParams) => void = useCallback((T) => {
     setVisible(true);
-    setStatus(params?.icon);
-    setMessage(params?.message);
+    setStatus(T?.icon);
+    setMessage(T?.message);
   }, []);
 
   /**
    * Callback
    * @description 关闭Alert
    */
-  const onClose = useCallback(() => setVisible(false), []);
+  const onClose: () => void = useCallback(() => setVisible(false), []);
 
-  const Alert = () => (
+  const Alert: () => JSX.Element = () => (
     <Snackbar
       anchorOrigin={{
         vertical: 'top',
@@ -75,9 +65,9 @@ const useAlert = () => {
    */
   useEffect(() => {
     // 如果存在信息
-    if (!message) return false;
+    if (!message) return () => {};
     // 创建dom元素
-    const element = document.createElement('div');
+    const element: HTMLDivElement = document.createElement('div');
     // 追加body
     document.body.appendChild(element);
     render(<Alert />, element);
@@ -97,4 +87,5 @@ const useAlert = () => {
   return [onOpen];
 };
 
-export { useAlert, AlertStatus };
+export { useAlert };
+export type { AlertStatus };
