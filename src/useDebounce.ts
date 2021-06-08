@@ -1,20 +1,32 @@
 import { useCallback, useRef, useEffect } from 'react';
 
 /**
+ * Type
+ * @description 函数ref
+ */
+type FnRef = {
+  fn: () => void;
+  timer: NodeJS.Timeout | null;
+};
+
+/**
  * 防抖
  * @param {Function} fn 执行事件
  * @param {Number} wait 等待时间
  * @returns {Array<Function>}
  */
-const useDebounce = (fn, wait) => {
+const useDebounce: (F: () => void, W: number) => [() => void, () => void] = (
+  fn,
+  wait
+) => {
   // 绑定传入的函数 创建定时器
-  const { current } = useRef({ fn, timer: null });
+  const { current } = useRef<FnRef>({ fn, timer: null });
 
   /**
    * Callback
    * 执行操作 事件
    */
-  const run = useCallback(() => {
+  const run: () => void = useCallback(() => {
     // 如果存在定时器 清空
     if (current.timer) {
       clearTimeout(current.timer);
@@ -29,7 +41,7 @@ const useDebounce = (fn, wait) => {
    * Callback
    * 取消操作 事件
    */
-  const cancel = useCallback(() => {
+  const cancel: () => void = useCallback(() => {
     // 如果存在定时器 清空
     if (current.timer) {
       clearTimeout(current.timer);
