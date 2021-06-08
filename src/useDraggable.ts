@@ -1,13 +1,28 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
+ * Interface
+ * @description 位置信息
+ */
+interface PositionState {
+  originPosition: number[]; // 初始位置
+  currentPosition: number[]; // 当前位置
+  dragging: boolean; // 拖拽状态
+}
+
+/**
  * 判断事件
  * @param {Event}
  * @return {Number} 0: TouchEvent, 1: MouseEvent 2: return
  */
-const decideEvent = params => {
+const decideEvent: (P: Event) => number = (params) => {
   if (window.TouchEvent && params instanceof window.TouchEvent) return 0;
-  if (window.MouseEvent && params instanceof window.MouseEvent && params.button === 0) return 1;
+  if (
+    window.MouseEvent &&
+    params instanceof window.MouseEvent &&
+    params.button === 0
+  )
+    return 1;
   return 2;
 };
 
@@ -17,9 +32,9 @@ const decideEvent = params => {
  *                   info 初始位置 当前位置 当前状态
  */
 const useDraggable = () => {
-  const bindRef = useRef(null); // 绑定Dom
-  const prevPosition = useRef([0, 0]); // 之前位置
-  const [state, setState] = useState({
+  const bindRef = useRef<HTMLElement>(null); // 绑定Dom
+  const prevPosition = useRef<number[]>([0, 0]); // 之前位置
+  const [state, setState] = useState<PositionState>({
     originPosition: [0, 0], // 初始位置
     currentPosition: [0, 0], // 当前位置
     dragging: false, // 拖拽状态
@@ -29,7 +44,7 @@ const useDraggable = () => {
    * 开始按下
    * @param {Event}
    */
-  const handleStart = useCallback(e => {
+  const handleStart = useCallback((e) => {
     e.stopPropagation();
     const {
       current: [prevX, prevY], // 获取之前位置
@@ -49,7 +64,7 @@ const useDraggable = () => {
       y = e.clientY - prevY;
     } else return;
 
-    setState(_state => ({
+    setState((_state) => ({
       ..._state,
       dragging: true, // 可以拖动
       originPosition: [x, y], // 初始位置
@@ -61,7 +76,7 @@ const useDraggable = () => {
    * @param {Event}
    */
   const handleMove = useCallback(
-    e => {
+    (e) => {
       const {
         dragging, // 状态
         originPosition: [startX, startY], // 初始位置
@@ -84,16 +99,26 @@ const useDraggable = () => {
       } else return;
 
       // 窗口边界
-      const outWindowDistance = e.clientX - (e.clientX - bindRef.current.offsetLeft - (e.clientX - startX));
+      const outWindowDistance =
+        e.clientX -
+        (e.clientX -
+          (bindRef.current as HTMLElement).offsetLeft -
+          (e.clientX - startX));
       // 最左侧 < 0 抛出
       if (outWindowDistance < 0) return;
       // 最右侧 < 0 抛出
-      if (document.body.clientWidth - bindRef.current.offsetWidth - outWindowDistance < 0) return;
+      if (
+        document.body.clientWidth -
+          (bindRef.current as HTMLElement).offsetWidth -
+          outWindowDistance <
+        0
+      )
+        return;
 
       // 更新位置状态
       prevPosition.current = [x, y];
 
-      setState(_state => ({
+      setState((_state) => ({
         ..._state,
         currentPosition: [x, y], // 当前位置
       }));
@@ -102,17 +127,17 @@ const useDraggable = () => {
         bindRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       }
     },
-    [state.dragging],
+    [state.dragging]
   );
 
   /**
    * 停止操作
    * @param {Event}
    */
-  const handleEnd = useCallback(e => {
+  const handleEnd = useCallback((e) => {
     // 判断是否存在事件
     if (decideEvent(e) < 2) {
-      setState(_state => ({
+      setState((_state) => ({
         ..._state,
         dragging: false, // 停止拖动
       }));
