@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, FC, useMemo } from 'react';
-import { useLifecycles } from './components';
+import { useLifecycles } from './hooks';
 
 interface IProps {
   fn: () => void;
